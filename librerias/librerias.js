@@ -2,12 +2,8 @@
     global.express = require('express');
     global.path = require('path');
     global.cookieParser = require('cookie-parser');
-    global.logger = require('morgan');
     global.mysql = require('mysql');
-    global.crypto = require('crypto');
     global.bodyParser = require('body-parser');
     global.moment = require('moment-timezone');
     global.reel = require('node-reel');
     global.fs = require('fs');
-    global.qrcode = require('qrcode')
-    global.SerialPort = require("serialport");

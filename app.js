@@ -13,13 +13,12 @@
     next();
   });
 
+  app.use(express.static(path.join(__dirname, 'public')));
+  //Limite tamaño del archivo
+  app.use(bodyParser.json({limit: '50mb'}));
+  app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
   app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
-  //app.use(express.static(path.join(__dirname, 'public')));
-
-  app.use(bodyParser.json()); // support json encoded
-  app.use(bodyParser.urlencoded({ extended: true })); // support encoded
 
   //APP
   app.use('/prospectos', prospectos);

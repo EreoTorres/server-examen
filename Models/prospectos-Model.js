@@ -16,45 +16,59 @@ module.exports = {
             })
         });
     },
-    setProspecto: function (prospecto) {
-        console.log({
-            nombre: prospecto.nombre,
-            pApellido: prospecto.pApellido,
-            sApellido: prospecto.sApellido,
-            calle: prospecto.calle,
-            numero: prospecto.numero,
-            colonia:  prospecto.colonia,
-            cp:  prospecto.cp,
-            telefono: prospecto.telefono,
-            rfc: prospecto.rfc,
-            observaciones: prospecto.observaciones,
-            idestatus: prospecto.estatus,
-        })
+    getDocumentos:function (id){
         return new Promise((resolve, reject) => {
-         connectionapp.query(
-                'INSERT INTO prospectos SET ?'
-            ,{
-                nombre: prospecto.nombre,
-                pApellido: prospecto.pApellido,
-                sApellido: prospecto.sApellido,
-                calle: prospecto.calle,
-                numero: prospecto.numero,
-                colonia:  prospecto.colonia,
-                cp:  prospecto.cp,
-                telefono: prospecto.telefono,
-                rfc: prospecto.rfc,
-                observaciones: prospecto.observaciones,
-                idestatus: prospecto.estatus,
-            }
-            ,async function (error, results, fields) {
-                resolve(results)
+            connectionapp.query(
+                'SELECT * FROM documentos WHERE idprospecto = '+id
+            ,async function (error, resuldoc, fields) {
+        
+                resolve(resuldoc)
             })
         });
+    },
+    setProspecto: function (prospecto) {
+        return new Promise((resolve, reject) => {
+            if(!prospecto.sApellido){
+                prospecto.sApellido = ''
+            }
+
+            if(prospecto.estatus == 1){
+                connectionapp.query(
+                    'INSERT INTO prospectos SET ?'
+                ,{
+                    nombre: prospecto.nombre,
+                    pApellido: prospecto.pApellido,
+                    sApellido: prospecto.sApellido,
+                    calle: prospecto.calle,
+                    numero: prospecto.numero,
+                    colonia:  prospecto.colonia,
+                    cp:  prospecto.cp,
+                    telefono: prospecto.telefono,
+                    rfc: prospecto.rfc,
+                    observaciones: '',
+                    idestatus: prospecto.estatus,
+                }
+                ,async function (error, results, fields) {
+                    resolve(results)
+                })
+            }else{
+                connectionapp.query(
+                    'UPDATE prospectos SET observaciones = ?,idestatus = ? WHERE (id = ?)'
+                ,[
+                    prospecto.observaciones,
+                    prospecto.estatus,
+                    prospecto.id
+                ]
+                ,async function (error, results, fields) {
+                    resolve(results)
+                })
+            }
+        })
     },
     saveFile: function (file,idprospecto){
         return new Promise((resolve, reject) => {
             var path = './public/docs/'+idprospecto+'/'+file.nombredoc+'-'+idprospecto+'.'+file.formato
-            console.log(path)
+
             fs.writeFile(path, file.base64, 'base64', 
                 error => {
                 if (error) {
@@ -62,7 +76,7 @@ module.exports = {
                 } else {
                     connectionapp.query(
                         'INSERT INTO documentos SET ?'
-                    ,{nombre: file.nombredoc,direccion: path,idprospecto: idprospecto}
+                    ,{nombre: file.nombredoc,direccion: path,idprospecto: idprospecto,formato: file.formato}
                     ,async function (error, results, fields) {
                         resolve(results)
                     })
@@ -70,5 +84,5 @@ module.exports = {
                 }
             });
         });
-    }
+    },
   };
